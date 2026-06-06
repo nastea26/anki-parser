@@ -1,0 +1,22 @@
+import type { DeckNamesAndIds, CardId, CardInfo} from '../types/anki'
+
+const ANKI_URL = 'http://127.0.0.1:8765';
+
+async function ankiRequest<T>( action: string, params?: Record<string, unknown> ): Promise<T> {
+    
+    const response = await fetch(ANKI_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:JSON.stringify({ action, version: 6, params })
+    })
+    const data = await response.json();
+
+    if(data.error) throw new Error(data.error);
+    return data.result as T;
+
+}
+
+export async function getDeckNamesAndIds(): Promise<DeckNamesAndIds> {
+    const action = "deckNamesAndIds";
+    return ankiRequest<DeckNamesAndIds>(action);
+}
