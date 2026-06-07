@@ -1,4 +1,4 @@
-import type { DeckNamesAndIds, CardId, CardInfo, DeckId, NoteId, NoteInfo} from '../types/anki'
+import type { DeckNamesAndIds, CardId, CardInfo, DeckId, NoteId, NoteInfo, Version, DeckName} from '../types/anki'
 
 const ANKI_URL = 'http://127.0.0.1:8765';
 
@@ -43,4 +43,16 @@ export async function getNotesInfo(noteIds: NoteId[]): Promise <NoteInfo[]>{
     const action = "notesInfo";
     const params = {notes: noteIds};
     return ankiRequest<NoteInfo[]>(action,params);
+}
+
+export async function getAnkiConnectVersion(): Promise <Version>{
+    const action = "version";
+    return ankiRequest<Version>(action);
+}
+
+export async function getDirectNoteCountFromDeck(deckName: DeckName ): Promise<number> {
+    const action = "findNotes"
+    const params = { query: `deck:"${deckName}" -deck:"${deckName}::*"` }
+    const notes = await ankiRequest<NoteId[]>(action, params)
+    return notes.length
 }

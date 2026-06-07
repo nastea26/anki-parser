@@ -43,3 +43,4 @@ export type NoteInfo = {
     mod: number,
     cards: number[]
 }
+export type Version = number;
