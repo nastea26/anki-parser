@@ -10,8 +10,8 @@ export type DeckId = number;
 export type DeckNamesAndIds = Record<DeckName, DeckId>;
 export type CardId = number;
 export type CardInfo = {
-    cardId: CardId;
-    fields: Record<string, {value: string, order: number}>
+    cardId: CardId,
+    fields: Record<string, {value: string, order: number}>,
     fieldOrder: number,
     question: string,
     answer: string,
@@ -32,4 +32,14 @@ export type CardInfo = {
     nextReviews: string[],
     flags: number,
 
+};
+export type NoteId = number;
+export type NoteInfo = {
+    noteId: NoteId,
+    profile:string,
+    tags:string[],
+    fields: Record<string, {value:string, order:number}>,
+    modelName: string,
+    mod: number,
+    cards: number[]
 }
