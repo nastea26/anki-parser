@@ -1,4 +1,4 @@
-#Anki Parser
+# Anki Parser
 The goal of this app is to make an app is to help you get a rough idea of how likely you are to understand a certain piece of media based on the vocabulary you already have in Anki.
 Later on, I'd like to add, at the very least, an anime sublitles api so you won't have to manually find/download the subtitle file to use this app.
 
