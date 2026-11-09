@@ -1,6 +1,6 @@
-export type AnalysisResult = {
-    uniqueCount: number,
-    known: string[],
-    unknown: string[],
-    percentage: number
+export type Token = {
+    surface: string
+    basicForm: string
+    reading: string
+    pos: string
 }

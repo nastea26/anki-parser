@@ -1,8 +1,6 @@
-import type { DeckId } from '../../shared/types/anki'
 import type kuromoji from 'kuromoji'
-import { getNotesFromDeck, getNotesInfo } from '../ankiConnect/client'
 import { tokenize } from '../tokenizer'
-import type { AnalysisResult } from '../../shared/types/analysis'
+import type { Token } from '../../shared/types/analysis'
 
 const EXCLUDED_POS = new Set([
     '助詞',      // particles (は、が、を、に、で...)
@@ -14,7 +12,7 @@ const EXCLUDED_POS = new Set([
     '接尾',      // suffixes (this catches ら、ら、たち etc.)
 ])
 
-function cleanTokens(tokens: kuromoji.IpadicFeatures[]): string[] {
+function cleanTokens(tokens: kuromoji.IpadicFeatures[]): kuromoji.IpadicFeatures[] {
     return tokens
         .filter(token =>
             !EXCLUDED_POS.has(token.pos) &&
@@ -22,37 +20,17 @@ function cleanTokens(tokens: kuromoji.IpadicFeatures[]): string[] {
             token.basic_form !== '*' &&
             token.basic_form.trim() !== ''
         )
-        .map(token => token.basic_form)
 }
 
-export async function analyzeText(text: string, selectedDeckIds: DeckId[]): Promise<AnalysisResult> {
+export async function analyzeText(text: string): Promise<Token[]> {
     const tokens = await tokenize(text)
-    const uniqueTokens = [...new Set(cleanTokens(tokens))]
+    const cleaned_tokens = cleanTokens(tokens)
+    
+    return cleaned_tokens.map(token=> ({
+        surface: token.surface_form,
+        basicForm: token.basic_form,
+        reading: token.reading ?? '',
+        pos: token.pos
+    }))
 
-    const noteInfos = await Promise.all(
-        selectedDeckIds.map(async (deckId) => {
-            try {
-                return await getNotesInfo(await getNotesFromDeck(deckId))
-            } catch (err) {
-                console.error(`Error fetching notes for deck ${deckId}:`, err)
-                return []
-            }
-        })
-    )
-
-    const known = new Set<string>()
-    for (const note of noteInfos.flat()) {
-        const first = Object.values(note.fields).find(field => field.order === 0)
-        if (first) known.add(first.value)
-    }
-
-    const matched = uniqueTokens.filter(token => known.has(token))
-    const unmatched = uniqueTokens.filter(token => !known.has(token))
-
-    return {
-        uniqueCount: uniqueTokens.length,
-        known : matched,
-        unknown : unmatched,
-        percentage: uniqueTokens.length > 0 ? (matched.length / uniqueTokens.length) * 100 : 0
-    }
 }

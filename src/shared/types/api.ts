@@ -3,6 +3,7 @@
 
 import type { DeckNode } from "./anki"
 import type { Result } from "./result"
+import type { Token } from "./analysis"
 
 export interface AnkiApi {
     isConnected:()=> Promise<boolean>
@@ -10,7 +11,7 @@ export interface AnkiApi {
 }
 
 export interface AnalyzeApi {
-    //this will be added when i get anki running
+    text: (text: string) => Promise<Result <Token[]> >
 }
 
 export interface ExternalApi {

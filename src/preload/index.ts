@@ -11,7 +11,7 @@ const api: Api = {
     },
     
     analyze:{
-
+        text: (text) => ipcRenderer.invoke(IPC.analyze.text, text),
     },
 
     external:{

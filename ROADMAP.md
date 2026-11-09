@@ -29,7 +29,7 @@ Goal: a desktop app that takes Japanese media (plain text, subtitles, epub, pdf)
 
 - [x] **Error handling over IPC:** logic layers throw a typed `AnkiError`; `main/api/*` endpoints wrap them with `toResult` and return `Result<T>`. Yes/no endpoints like `isConnected` return a plain `boolean`.
 - [x] **Channel names:** constants in `src/shared/ipcChannels.ts`
-- [ ] **`analyze.text` output:** a full ordered `Token[]` (allows highlighting later) or grouped `WordCount[]` with counts (smaller response)
+- [x] **`analyze.text` output:** `Token[]` (`{ surface, basicForm, reading, pos }`), word tokens only (filtered by `EXCLUDED_POS`), in text order with duplicates kept. Both percentages match on `basicForm` (flashcards store dictionary forms); `surface` is for display only. Vocabulary % = known unique `basicForm`s / unique `basicForm`s; coverage % = word tokens whose `basicForm` is known / all word tokens (duplicates counted).
 - [ ] **`analyze` input shape:** `text: string` only, or `{ kind: 'text' | 'file', ... }` to leave room for M4
 - [ ] **Anki disconnects mid-session:** keep the cached known words so analysis still works offline, or block the Analyse page until Anki reconnects
 
@@ -81,10 +81,10 @@ The UI only needs to be functional here: reuse the existing test UI, since it ge
 
 ### Phase 3: Analyse (stays here)
 
-- [ ] Rework `analyze/` to tokenize and filter only (no Anki imports), keeping duplicates or counts
+- [ ] Rework `analyze/` to tokenize and filter only (no Anki imports), returning word-only `Token[]` with duplicates kept
 - [ ] `main/api/analyze.ts`: `text()`, plus the `AnalyzeApi` type, channel, handler and preload method
 - [ ] `Pages/Analyse.tsx`: if no decks are selected, show a prompt with a link to the Anki page
-- [ ] Calculate **vocabulary %** (unique words) and **coverage %** (running text) in the frontend against the cached `Set`
+- [ ] Calculate **vocabulary %** (unique `basicForm`s) and **coverage %** (all word tokens, duplicates counted) in the frontend against the cached `Set`
 - [ ] Show both percentages plus known and unknown word counts
 - [ ] Show which decks are active, with a "Change decks" link back to the Anki page
 - [ ] Repeat analyses must not call Anki: only `analyze.text` runs per click
@@ -124,7 +124,7 @@ Each parser produces plain text that goes into `analyze`. Analyze itself never k
 ## M5: Useful output
 
 - [ ] Unknown words ranked by frequency (what to learn next)
-- [ ] Highlight unknown words in the source text (needs ordered tokens)
+- [ ] Highlight unknown words in the source text: keep `analyze` word-only (non-words filtered by POS); add each token's character offset (kuromoji `word_position`) to `Token`, and mark unknown words by position in the original text the frontend already has
 - [ ] Export unknown words (CSV, or straight into an Anki deck through AnkiConnect `addNotes`)
 - [ ] Per-file history of past analyses
 

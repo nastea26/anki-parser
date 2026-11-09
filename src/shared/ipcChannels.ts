@@ -5,7 +5,7 @@ export const IPC = {
 
     },
     analyze:{
-
+        text: 'analyze:text',
     },
     external:{
 
