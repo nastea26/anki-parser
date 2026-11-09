@@ -1,5 +1,5 @@
-import { Result } from "../../shared/types/result"
-import { AnkiError } from "../anki/ankiConnect"
+import type { Result } from "../../shared/types/result"
+import { AnkiError } from "../ankiConnect/client"
 
 export async function toResult<T>(fn: () => Promise<T>): Promise<Result<T>>{
     try{

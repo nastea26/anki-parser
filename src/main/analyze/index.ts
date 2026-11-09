@@ -1,6 +1,6 @@
 import type { DeckId } from '../../shared/types/anki'
 import type kuromoji from 'kuromoji'
-import { getNotesFromDeck, getNotesInfo } from '../anki/ankiConnect'
+import { getNotesFromDeck, getNotesInfo } from '../ankiConnect/client'
 import { tokenize } from '../tokenizer'
 import type { AnalysisResult } from '../../shared/types/analysis'
 

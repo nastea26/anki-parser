@@ -2,6 +2,8 @@ import type { DeckNamesAndIds, CardId, CardInfo, DeckId, NoteId, NoteInfo, Versi
 import { ErrorType } from '../../shared/types/result';
 
 const ANKI_URL = 'http://127.0.0.1:8765';
+type MultiItem<T> = { result: T | null, error: string | null }
+
 
 export class AnkiError extends Error{
     constructor(public type: ErrorType, message: string) { super(message) }
@@ -63,9 +65,17 @@ export async function getAnkiConnectVersion(): Promise <Version>{
     return ankiRequest<Version>(action);
 }
 
-export async function getDirectNoteCountFromDeck(deckName: DeckName ): Promise<number> {
-    const action = "findNotes"
-    const params = { query: `deck:"${deckName}" -deck:"${deckName}::*"` }
-    const notes = await ankiRequest<NoteId[]>(action, params)
-    return notes.length
+export async function getDirectNoteCountsFromDecks(deckNames: DeckName[] ): Promise<Record <DeckName, number> > {
+    const actions = deckNames.map(name => ({
+        action: 'findNotes',
+        version: 6,
+        params:{query: `deck:"${name}" -deck:"${name}::*"`}
+    }))
+    const res = await ankiRequest<MultiItem <NoteId[]> []>('multi', {actions})
+
+    return Object.fromEntries(deckNames.map((name, i) => {
+        const r = res[i]
+        if( r.error )throw new AnkiError('anki', `${name}: ${r.error}`)
+        return [name, r.result?.length ?? 0]
+    }))
 }

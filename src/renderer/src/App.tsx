@@ -28,6 +28,14 @@ function App(): React.JSX.Element {
         }
     }, [])
 
+    useEffect(() => {
+        if (!ankiConnected) return
+        window.api.anki.getDeckTree().then(res => {
+            if (res.ok) console.log('Deck tree:', res.data)
+            else console.error('getDeckTree failed:', res.error)
+        })
+    }, [ankiConnected])
+
 
     return (
     <div className="flex flex-col h-screen bg-gray-900 text-white">

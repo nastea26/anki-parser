@@ -1,8 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-// import { getDeckNamesAndIds, getDirectNoteCountFromDeck } from '../lib/anki'
-// import { getAllLeafDescendants } from '../lib/deckUtils'
 import type { DeckNamesAndIds, DeckId } from '../../../shared/types/anki'
-//import DeckItem from '../components/deck/DeckItem'
 
 interface AnkiProps {
     ankiConnected: boolean

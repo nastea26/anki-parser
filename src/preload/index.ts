@@ -6,7 +6,8 @@ import { IPC } from '../shared/ipcChannels'
 // Bridge: each method should forward to main via ipcRenderer.invoke('channel', ...args)
 const api: Api = {
     anki: {
-        isConnected: () => ipcRenderer.invoke(IPC.anki.isConnected)
+        isConnected: () => ipcRenderer.invoke(IPC.anki.isConnected),
+        getDeckTree: () => ipcRenderer.invoke(IPC.anki.getDeckTree)
     },
     
     analyze:{

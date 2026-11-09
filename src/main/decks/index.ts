@@ -1,4 +1,4 @@
-import { getDeckNamesAndIds, getDirectNoteCountFromDeck } from './ankiConnect'
+import { getDeckNamesAndIds, getDirectNoteCountsFromDecks } from '../ankiConnect/client'
 import type { DeckNamesAndIds, DeckNode } from '../../shared/types/anki'
 
 function buildNode( name: string, allNames: string[], deckMap: DeckNamesAndIds, counts: Record<string, number>): DeckNode {
@@ -6,9 +6,9 @@ function buildNode( name: string, allNames: string[], deckMap: DeckNamesAndIds, 
         .filter(other => other.startsWith(name + '::') && !other.slice(name.length + 2).includes('::'))
         .map(child => buildNode(child, allNames, deckMap, counts))
 
-    const leafIds = children.length > 0
-        ? children.flatMap(child => child.leafIds)
-        : counts[name] > 0 ? [deckMap[name]] : []
+    const own = counts[name] > 0 ? [deckMap[name]] : []
+
+    const leafIds =[...own, ...children.flatMap(child=>child.leafIds)]
 
     return {
         id: deckMap[name],
@@ -20,15 +20,10 @@ function buildNode( name: string, allNames: string[], deckMap: DeckNamesAndIds, 
     }
 }
 
-export async function getDeckTree(): Promise<DeckNode[]> {
+export async function buildDeckTree(): Promise<DeckNode[]> {
     const deckMap = await getDeckNamesAndIds()
     const allNames = Object.keys(deckMap)
-    const counts: Record<string, number> = Object.fromEntries(
-        await Promise.all(
-            allNames.map(async name => [name, await getDirectNoteCountFromDeck(name)] as const)
-        )
-    )
+    const counts = await getDirectNoteCountsFromDecks(allNames)
     return allNames
-        .filter(name => !name.includes('::'))
-        .map(name => buildNode(name, allNames, deckMap, counts))
+    .filter(name => !name.includes('::') ).map( name=> buildNode(name, allNames, deckMap, counts) )
 }
