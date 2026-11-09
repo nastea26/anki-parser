@@ -1,14 +1,10 @@
-//fetch cmds:
-/* 
-curl http://127.0.0.1:8765   -X POST   -H "Content-Type: application/json"   -d '{"action": "findCards", "version": 6, "params": {"query": "did:1753216958205"}}' | jq
-curl http://127.0.0.1:8765   -X POST   -H "Content-Type: application/json"   -d '{"action": "deckNamesAndIds", "version": 6}' | jq
- curl http://127.0.0.1:8765   -X POST   -H "Content-Type: application/json"   -d '{"action": "cardsInfo", "version": 6, "params": { "cards": [1753642900906] } }' | jq
-*/
-
 export type DeckName = string;
 export type DeckId = number;
 export type DeckNamesAndIds = Record<DeckName, DeckId>;
 export type CardId = number;
+export type Version = number;
+export type NoteId = number;
+
 export type CardInfo = {
     cardId: CardId,
     fields: Record<string, {value: string, order: number}>,
@@ -31,9 +27,7 @@ export type CardInfo = {
     mod: number,
     nextReviews: string[],
     flags: number,
-
 };
-export type NoteId = number;
 export type NoteInfo = {
     noteId: NoteId,
     profile:string,
@@ -43,4 +37,12 @@ export type NoteInfo = {
     mod: number,
     cards: number[]
 }
-export type Version = number;
+
+export type DeckNode = {
+    id: DeckId,
+    name: DeckName, // 'full path -> Root::subdeck::subsubdeck'
+    label: string, //'deck name'
+    noteCount: number, //directly in this deck
+    leafIds: DeckId[], //all leaf decks at or under this node 
+    children: DeckNode[]
+}

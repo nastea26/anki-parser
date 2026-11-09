@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import type { DeckId } from '../types/anki'
+import type { DeckId } from '../../../shared/types/anki'
 import TextInput from '../components/analysis/TextInput'
-import { analyzeText } from '../lib/analyze'
+// import { analyzeText } from '../lib/analyze'
 
 interface AnalyseProps {
     ankiConnected: boolean
@@ -10,9 +10,11 @@ interface AnalyseProps {
 
 export default function Analyse({ ankiConnected, selectedDeckIds }: AnalyseProps): React.JSX.Element {
     const [text, setText] = useState<string>('')
-
+    selectedDeckIds.map(id => console.log(id))
     const handleAnalyse = (content: string) => {
-        analyzeText(content, selectedDeckIds)
+        //analyzeText(content, selectedDeckId
+        console.log("Analyzing content:", content)
+        console.log("Not implemented")
     }
 
     if (!ankiConnected) {

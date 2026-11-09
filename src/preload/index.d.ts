@@ -1,12 +1,9 @@
-import { ElectronAPI } from '@electron-toolkit/preload'
-import { ElectronAPI } from '@electron-toolkit/preload'
-import type kuromoji from 'kuromoji'
+import type { ElectronAPI } from '@electron-toolkit/preload'
+import type { Api } from '../shared/types/api'
 
 declare global {
-  interface Window {
-    electron: ElectronAPI
-    api: {
-      tokenize: (text: string) => Promise<kuromoji.IpadicFeatures[]>
+    interface Window {
+        electron: ElectronAPI
+        api: Api
     }
-  }
 }

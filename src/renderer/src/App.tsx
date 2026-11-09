@@ -1,28 +1,33 @@
-import { useState, useEffect } from 'react'
-import Sidebar from './components/layout/Sidebar';
-import Topbar from './components/layout/Topbar'
-import Home from './Pages/Home';
-import Anki from './Pages/Anki';
-import Analyse from './Pages/Analyse';
-import { getAnkiConnectVersion } from './lib/anki';
-import { DeckId } from './types/anki';
-export type View = 'home' | 'anki' | 'analyse'
+import { useState, useEffect } from 'react';
 
+import Sidebar from './components/layout/Sidebar';
+import Topbar from './components/layout/Topbar';
+import Home from './Pages/Home';
+
+export type View = 'home' | 'anki' | 'analyse'
 
 function App(): React.JSX.Element {
     const [ankiConnected, setAnkiConnected] = useState<boolean>(false)
     const [view, setView] = useState<View>('home')
-    const [selectedDeckIds, setSelectedDeckIds] = useState<DeckId[]>([])
-    useEffect(() => {
-    const check = () => {
-        getAnkiConnectVersion()
-        .then(() => setAnkiConnected(true))
-        .catch(() => setAnkiConnected(false))
-    }
-    check()
-    const interval = setInterval(check, 5000)
-    return () => clearInterval(interval)
+
+    useEffect( () => {
+        let cancelled = false
+        let timer: ReturnType<typeof setTimeout>
+
+        const check = async (): Promise <void> => {
+            const connected = await window.api.anki.isConnected()
+            if(cancelled) return
+            setAnkiConnected(connected)
+            timer = setTimeout(check, 5000)
+        }
+        
+        check()
+        return () => {
+            cancelled = true
+            clearTimeout(timer)
+        }
     }, [])
+
 
     return (
     <div className="flex flex-col h-screen bg-gray-900 text-white">
@@ -31,8 +36,8 @@ function App(): React.JSX.Element {
         <Sidebar currentView={view} onNavigate={setView} />
         <main className="flex-1 overflow-auto p-6">
             {view === 'home' && <Home/>}
-            {view === 'anki' && <Anki ankiConnected={ankiConnected} selectedDeckIds={selectedDeckIds} setSelectedDeckIds={setSelectedDeckIds} />}
-            {view === 'analyse' && <Analyse ankiConnected={ankiConnected} selectedDeckIds={selectedDeckIds} />}
+            {/* {view === 'anki' && <Anki ankiConnected={ankiConnected} selectedDeckIds={selectedDeckIds} setSelectedDeckIds={setSelectedDeckIds} />}
+            {view === 'analyse' && <Analyse ankiConnected={ankiConnected} selectedDeckIds={selectedDeckIds} />} */}
         </main>
         </div>
     </div>
